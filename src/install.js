@@ -63,8 +63,7 @@ function createHook(huskyDir, hooksDir, hookName, cmd) {
 
 function installFrom(huskyDir) {
   try {
-    const isInSubNodeModule = (huskyDir.match(/node_modules/g) || []).length > 1
-    if (isInSubNodeModule) {
+    if (isInSubNodeModule(huskyDir)) {
       return console.log(
         "trying to install from sub 'node_module' directory,",
         'skipping Git hooks installation'
@@ -108,6 +107,20 @@ function installFrom(huskyDir) {
   } catch (e) {
     console.error(e)
   }
+}
+
+function isInSubNodeModule(huskyDir) {
+  // The INIT_CWD env variable is declared by npm/pnpm when running lifecycle events.
+  // The value of INIT_CWD is the path to the project's directory.
+  if (process.env.INIT_CWD) {
+    try {
+      const rootFilename = fs.realpathSync(path.join(process.env.INIT_CWD, 'node_modules', 'husky', 'src', 'install.js'))
+      if (rootFilename === __filename) {
+        return false
+      }
+    } catch (err) {}
+  }
+  return (huskyDir.match(/node_modules/g) || []).length > 1
 }
 
 module.exports = installFrom
