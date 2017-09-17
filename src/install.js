@@ -23,7 +23,7 @@ function createHook(huskyDir, hooksDir, hookName, cmd) {
   const filename = path.join(hooksDir, hookName)
 
   // Assuming that this file is in node_modules/husky
-  const packageDir = path.join(huskyDir, '..', '..')
+  const packageDir = process.env.INIT_CWD || path.join(huskyDir, '..', '..')
 
   // Get project directory
   // When used in submodule, the project dir is the first .git that is found
